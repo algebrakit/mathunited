@@ -3,3 +3,6 @@ GAE/Mathunited/war
 GAE/Mathunited/.metadata
 Publisher/html/leerlijnen
 Publisher/html/moxiemanager/data/storage/user.anonymous.json
+**/.idea/
+**/.DS_Store
+GAE_M4A/*.iml

@@ -95,7 +95,6 @@ public class ViewServlet extends HttpServlet {
                     LOGGER.info("Setting repo from variant: " + repo);
                 }
             }
-            LOGGER.info("MSLO:: using variant " + variant);
             if (repo == null) {
                 throw new Exception("Het verplichte argument 'repo' ontbreekt: " + repo);
             }

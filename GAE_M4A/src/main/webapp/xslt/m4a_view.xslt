@@ -421,11 +421,16 @@ indent="yes" encoding="utf-8"/>
     <script>
             AlgebraKIT = {
                 config: {
-                    proxy: 'https://content.math4all.nl'
+                    proxy: {
+                        url: 'https://content.math4all.nl/algebrakit'
+                    },
+                    secureProxy: {
+                        url: 'https://content.math4all.nl/algebrakit'
+                    }
                 }
             };
     </script>
-    <script src='https://algebrakit.eu/akit-widgets.min.js'></script>
+    <script src='https://widgets.algebrakit.com/akit-widgets.min.js'></script>
 </body>
 </html>
 </xsl:template>
