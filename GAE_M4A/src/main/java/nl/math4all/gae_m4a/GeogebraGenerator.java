@@ -29,7 +29,8 @@ public class GeogebraGenerator extends HttpServlet {
 	private static final long serialVersionUID = 8160691505447446635L;
 	
 	private final static Logger LOGGER = Logger.getLogger(GeogebraGenerator.class.getName());
-        String ggbSource = "web.geogebra.org/4.2/web/web.nocache.js";
+        String ggbSource = "www.geogebra.org/apps/deployggb.js";
+        // String ggbSource = "web.geogebra.org/4.2/web/web.nocache.js";
 //    String ggbSource = "http://www.geogebra.org/web/4.2/web/web.nocache.js";
 
     @Override
@@ -86,10 +87,24 @@ public class GeogebraGenerator extends HttpServlet {
                 bos.close();
             }
             String b64 = DatatypeConverter.printBase64Binary(b);
+
             response.setContentType("text/html");
             pw.println("<html style='overflow:hidden'><head><style type='text/css'><!--body { font-family:Arial,Helvetica,sans-serif; margin-left:40px }--></style><script type='text/javascript' language='javascript' src='"+protocol+ggbSource+"'></script></head>");
             pw.println("<body><article class='geogebraweb' style='display:inline-block;' data-param-ggbbase64='"+b64+"'></article>");
-            pw.println("<script type='text/javascript'>var ggbApplet = document.ggbApplet;function ggbOnInit() {}</script></body></html>");
+            pw.println("<div id=\"ggb-element\"></div>");
+            pw.println("<script>  \n" +
+                    "    var params = {\"appName\": \"geometry\", \"showToolBar\": false, \"showAlgebraInput\": false, \"showMenuBar\": false };\n" +
+                    "    var applet = new GGBApplet(params, true);\n" +
+                    "    window.addEventListener(\"load\", function() { \n" +
+                    "        applet.inject('ggb-element');\n" +
+                    "    });\n" +
+                    "</script>");
+            pw.println("</body></html>");
+
+            // response.setContentType("text/html");
+            // pw.println("<html style='overflow:hidden'><head><style type='text/css'><!--body { font-family:Arial,Helvetica,sans-serif; margin-left:40px }--></style><script type='text/javascript' language='javascript' src='"+protocol+ggbSource+"'></script></head>");
+            // pw.println("<body><article class='geogebraweb' style='display:inline-block;' data-param-ggbbase64='"+b64+"'></article>");
+            // pw.println("<script type='text/javascript'>var ggbApplet = document.ggbApplet;function ggbOnInit() {}</script></body></html>");
         } catch(Exception e) {
             pw.println("An error occured: "+e.getMessage());
             e.printStackTrace();
