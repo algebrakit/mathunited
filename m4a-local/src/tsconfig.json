@@ -1,0 +1,22 @@
+{
+  "compilerOptions": {
+    "allowJs": true,
+    "target": "es5",
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "sourceMap": true,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "lib": [ "es2015", "dom" ],
+    "skipLibCheck": true,
+    "outDir": "../dist",
+    "typeRoots": [
+      "../node_modules/@types/"
+    ],
+    "noImplicitAny": false
+  },
+  "compileOnSave": true,
+  "exclude": [
+    "node_modules/*"
+  ]
+}

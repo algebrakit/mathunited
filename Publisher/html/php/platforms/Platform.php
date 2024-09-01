@@ -11,11 +11,11 @@ abstract class Platform {
     public function prePublish($logger) {return true;}
 
     //Upload a single component
-    public function publishComponentFile($compId, $compRef, $basePath, $logger) {return true;}
+    public function publishComponentFile($compId, $compRef, $basePath, $repo, $logger) {return true;}
     //Upload a single subcomponent
     public function publishSubcomponent($comp, $threadID, $logger) {return true;}
     //Upload components.xml and threads.xml
-    public function publishOverview($repo, $logger) {return true;}
+    public function publishOverview($repoID, $repo, $logger, $threadsXML, $componentsXML) {return true;}
     //clean up, log out
     public function postPublish() {return true;}
     //Upload a single component

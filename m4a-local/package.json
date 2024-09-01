@@ -1,0 +1,23 @@
+{
+  "name": "m4a-local",
+  "version": "1.0.0",
+  "description": "",
+  "author": "",
+  "license": "ISC",
+  "scripts": {
+    "start": "node ./dist/main.js",
+    "debug": "node --inspect-brk=8091 ./dist/main.js",
+    "build": "./build.sh",
+    "build-xslt": "xslt3 -xsl:resources/xslt/m4a_view.xslt -export:m4a_view.sef.json -nogo;xslt3 -xsl:resources/xslt/m4a_view_en.xslt -export:m4a_view_en.sef.json -nogo; xslt3 -xsl:resources/xslt/m4a_view_mbo.xslt -export:m4a_view_mbo.sef.json -nogo; mv m4a_view* resources",
+    "build-full": "./build.sh; npm run build-xslt"
+  },
+  "devDependencies": {
+    "@types/node": "^9.4.6"
+  },
+  "dependencies": {
+    "@xmldom/xmldom": "^0.9.0",
+    "command-line-args": "^6.0.0",
+    "saxon-js": "^2.6.0",
+    "xpath": "^0.0.34"
+  }
+}
