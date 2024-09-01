@@ -3,6 +3,8 @@ export interface VariantSetting {
     useSector: boolean;
 }
 
+export const SECTORS:string[] = ['bev', 'asc', 'eng', 'mob', 'ict', 'all'];
+
 export const VARIANTS:{[key:string]:VariantSetting} = {
     hv: {
         xsl: 'm4a_view',

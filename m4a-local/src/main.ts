@@ -2,13 +2,16 @@
 // xslt3 -xsl:resources/xslt/m4a_view.xslt -export:m4a_view.sef.json -nogo     
 
 import { processFolder } from "./generate";
-import { USER_OPTIONS } from "./options";   
+import { getOptions } from "./options";
+let USER_OPTIONS;
 
 const fs = require('fs');
 const path = require('path');
 
 async function main() {
     try{
+        USER_OPTIONS = await getOptions();
+
         // copy css and js files to the target folder
         copyFiles();
         // search for modules in the folder
