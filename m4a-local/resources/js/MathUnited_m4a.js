@@ -19,20 +19,17 @@ $(document).ready(function() {
     } else {
         $('#verder-button a').html($('a',next).html());
     }
-/*    
-    $('.textref').each(function(index, elm){
-        elm = $(elm);
-        var item = elm.attr('item');
-        var ref = $('.crossref-item[item="'+item+'.xml"]',$('#info-hidden')).first();
-        var num = ref.attr('num');
-        if(num){
-            elm.html(elm.html()+' '+num);
-            if(elm.attr('href')) {
-                elm.attr('href', elm.attr('href')+'&num='+num);
-            }
-        }
-    });
-*/    
+
+    // set the overzicht link
+    const urlParams = new URLSearchParams(window.location.search);
+    let parent = urlParams.get('parent');
+    if(parent) {
+        document.getElementById('overzicht-link').href = 'https://'+parent;
+    } else {
+        let elm = document.getElementById('overzicht-link');
+        elm.remove();
+    }
+
 });
 
 function toggleMovie(elm) {
@@ -114,6 +111,16 @@ function MU_fontSelect(size) {
            break;
     }
     
+}
+
+function M4A_link(url)  {
+    // read the query parameters from the current page
+    const urlParams = new URLSearchParams(window.location.search);
+    let parent = urlParams.get('parent');
+    if(parent) {
+        url += '?parent='+parent;
+    }
+    window.location = url;
 }
 /* jquery jscroll pluging */
 (function($){$.fn.jScroll=function(e){var f=$.extend({},$.fn.jScroll.defaults,e);return this.each(function(){var a=$(this);var b=$(window);var c=new location(a);b.scroll(function(){a.stop().animate(c.getMargin(b),f.speed)})});function location(d){this.min=d.offset().top;this.originalMargin=parseInt(d.css("margin-top"),10)||0;this.getMargin=function(a){var b=d.parent().height()-d.outerHeight();var c=this.originalMargin;if(a.scrollTop()>=this.min)c=c+f.top+a.scrollTop()-this.min;if(c>b)c=b;return({"marginTop":c+'px'})}}};$.fn.jScroll.defaults={speed:"slow",top:10}})(jQuery);

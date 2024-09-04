@@ -56,6 +56,12 @@ if (isset($_GET['sector'])) {
     $sector = 'no-sector';
 }
 
+if (isset($_GET['parent'])) {
+    $parent = $_GET['parent'];
+} else {
+    $parent = null;
+}
+
 $variant_spec = $VARIANT_MAP[$variant];
 if (!$variant_spec) {
     $variant_spec = $VARIANT_MAP['m4a_view'];
@@ -74,6 +80,10 @@ if($num) {
     $new_path .= "-$num";
 }
 $new_path .= ".html";
+
+if($parent!==null) {
+    $new_path .= "?parent=$parent";
+}
 
 // Redirect to the new path
 header("Location: $new_path");

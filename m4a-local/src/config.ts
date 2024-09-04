@@ -36,10 +36,10 @@ export const ITEMS = {
         exercises: true
     },
     'digest': {},
-    'extra': {},
     'summary': {},
     'test': {},
     'application': {},
+    'extra': {},
     'background': {},
     'exam': {},
     'answers': {

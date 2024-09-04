@@ -67,15 +67,25 @@ extension-element-prefixes="exsl">
 <xsl:variable name="intraLinkPrefix">
     <xsl:choose>
         <xsl:when test="string-length($sector) > 0">
-            <xsl:value-of select="concat('../../../',$sector,'/',$comp,'/',$subcomp,'/',$subcomp,'-')"/>
+            <xsl:value-of select="concat('javascript:M4A_link(&quot;../../../',$sector,'/',$comp,'/',$subcomp,'/',$subcomp,'-')"/>
         </xsl:when>
         <xsl:otherwise>
-            <xsl:value-of select="concat($subcomp,'-')"/>
+            <xsl:value-of select="concat('javascript:M4A_link(&quot;',$subcomp,'-')"/>
         </xsl:otherwise>
     </xsl:choose>
 </xsl:variable>
+<xsl:variable name="intraComponentLinkPrefix">
+    <xsl:value-of select="'javascript:M4A_link(&quot;../'"/>
+</xsl:variable>
 <xsl:variable name="_cross_ref_as_links_" select="true()"/>
 <xsl:variable name="_sheetref_as_links_" select="true()"/>
+
+<xsl:variable name="xml-filtered">
+    <xsl:apply-templates mode="filter"/>
+</xsl:variable>
+<xsl:variable name="xml">
+    <xsl:apply-templates select="$xml-filtered" mode="numbering"/>
+</xsl:variable>
 
 <xsl:output method="html" doctype-system="http://www.w3.org/TR/html4/strict.dtd" doctype-public="-//W3C//DTD HTML 4.01//EN"
 indent="yes" encoding="utf-8"/>
@@ -90,12 +100,6 @@ indent="yes" encoding="utf-8"/>
 <!--   PRE PROCESS      -->
 <!--   **************** -->
 <xsl:template match="/">
-    <xsl:variable name="xml-filtered">
-        <xsl:apply-templates mode="filter"/>
-    </xsl:variable>
-    <xsl:variable name="xml">
-        <xsl:apply-templates select="$xml-filtered" mode="numbering"/>
-    </xsl:variable>
     <xsl:apply-templates select="$xml" mode="process"/>
 </xsl:template>
 
@@ -238,9 +242,6 @@ indent="yes" encoding="utf-8"/>
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS_CHTML">
     </script>
     <script type="text/javascript">
-        <xsl:attribute name="src"><xsl:value-of select="concat($css_js_base,'js/MathUnited.js')"/></xsl:attribute>
-    </script>
-    <script type="text/javascript">
         <xsl:attribute name="src"><xsl:value-of select="concat($css_js_base,'js/MathUnited_m4a.js')"/></xsl:attribute>
     </script>
     <link rel="stylesheet">
@@ -282,7 +283,9 @@ indent="yes" encoding="utf-8"/>
         </xsl:if>
         <xsl:value-of select="$component_title"/> &gt; <xsl:value-of select="$subcomponent_title"/>
     </div>
- 
+    <div class="overzichtDiv">
+        <a id="overzicht-link">Overzicht</a>
+    </div>
     <div style="clear:both"/>
 </div>
 <div class="sectionDiv">
@@ -381,7 +384,7 @@ indent="yes" encoding="utf-8"/>
             <xsl:apply-templates select="subcomponent/componentcontent/*" mode="navigation"/>
             <div class="menu-item-div menu-item-answer" item="answers">
             <a>
-                <xsl:attribute name="href"><xsl:value-of select="concat($intraLinkPrefix,'answers.html')"/></xsl:attribute>
+                <xsl:attribute name="href"><xsl:value-of select="concat($intraLinkPrefix,'answers.html&quot;)')"/></xsl:attribute>
                 <xsl:choose>
                     <xsl:when test="$itemInner='answers'">
                          <xsl:attribute name="id">selected-menu-item</xsl:attribute>
@@ -442,7 +445,7 @@ indent="yes" encoding="utf-8"/>
             <span class="list-section-nr">
                 <a>
                     <xsl:attribute name="href">
-                        <xsl:value-of select="concat('../',$comp,$i,'/index.html')"/>
+                        <xsl:value-of select="concat($intraComponentLinkPrefix,$comp,$i,'/index.html&quot;)')"/>
                     </xsl:attribute>
                     <xsl:value-of select="$i"/>
                 </a>
@@ -667,6 +670,15 @@ indent="yes" encoding="utf-8"/>
 
 <xsl:template match="title" mode="content-title"><xsl:apply-templates mode="content"/></xsl:template>
 
+<xsl:template match="textref" mode="content">
+    <xsl:variable name="item" select="concat(@item,'.xml')"/>
+    <xsl:value-of select="."/>
+    <xsl:variable name="target" select="$xml//include[@filename=$item]"/>
+    <xsl:if test="$target/@num">
+        <xsl:value-of select="concat(' ',$target/@num)"/>
+    </xsl:if>
+</xsl:template>
+
 <xsl:template match="p">
     <xsl:apply-templates mode="content"/>
 </xsl:template>
@@ -679,7 +691,7 @@ indent="yes" encoding="utf-8"/>
            <xsl:attribute name="context"><xsl:value-of select="@type"/></xsl:attribute>
        </xsl:if>
        <a>
-            <xsl:attribute name="href"><xsl:value-of select="concat($intraLinkPrefix,'explore.html')"/></xsl:attribute>
+            <xsl:attribute name="href"><xsl:value-of select="concat($intraLinkPrefix,'explore.html&quot;)')"/></xsl:attribute>
             <xsl:choose>
                 <xsl:when test="$itemInner='explore'">
                     <xsl:attribute name="id">selected-menu-item</xsl:attribute>
@@ -694,7 +706,7 @@ indent="yes" encoding="utf-8"/>
 <xsl:template match="introduction" mode="navigation">
    <div class="menu-item-div" item="introduction">
        <a>
-            <xsl:attribute name="href"><xsl:value-of select="concat($intraLinkPrefix,'introduction.html')"/></xsl:attribute>
+            <xsl:attribute name="href"><xsl:value-of select="concat($intraLinkPrefix,'introduction.html&quot;)')"/></xsl:attribute>
             <xsl:choose>
                 <xsl:when test="$itemInner='introduction'">
                     <xsl:attribute name="id">selected-menu-item</xsl:attribute>
@@ -712,7 +724,7 @@ indent="yes" encoding="utf-8"/>
         <xsl:when test="count(preceding-sibling::explanation)+count(following-sibling::explanation) > 0">
            <div class="menu-item-div" item="explanation">
                <a>
-                <xsl:attribute name="href"><xsl:value-of select="concat($intraLinkPrefix,'explanation-',$explnum,'.html')"/></xsl:attribute>
+                <xsl:attribute name="href"><xsl:value-of select="concat($intraLinkPrefix,'explanation-',$explnum,'.html&quot;)')"/></xsl:attribute>
                 <xsl:choose>
                         <xsl:when test="$itemInner='explanation' and $explnum=number($num)">
                             <xsl:attribute name="id">selected-menu-item</xsl:attribute>
@@ -727,7 +739,7 @@ indent="yes" encoding="utf-8"/>
         <xsl:otherwise>
            <div class="menu-item-div" item="explanation">
                <a>
-                    <xsl:attribute name="href"><xsl:value-of select="concat($intraLinkPrefix,'explanation-1.html')"/></xsl:attribute>
+                    <xsl:attribute name="href"><xsl:value-of select="concat($intraLinkPrefix,'explanation-1.html&quot;)')"/></xsl:attribute>
                     <xsl:choose>
                         <xsl:when test="$itemInner='explanation' and not(number($num) > 1)">
                             <xsl:attribute name="id">selected-menu-item</xsl:attribute>
@@ -745,7 +757,7 @@ indent="yes" encoding="utf-8"/>
    <xsl:if test="include">
        <div class="menu-item-div" item="theory">
            <a>
-            <xsl:attribute name="href"><xsl:value-of select="concat($intraLinkPrefix,'theory.html')"/></xsl:attribute>
+            <xsl:attribute name="href"><xsl:value-of select="concat($intraLinkPrefix,'theory.html&quot;)')"/></xsl:attribute>
             <xsl:choose>
                     <xsl:when test="$itemInner='theory'">
                        <xsl:attribute name="id">selected-menu-item</xsl:attribute>
@@ -765,7 +777,7 @@ indent="yes" encoding="utf-8"/>
            <xsl:attribute name="num"><xsl:value-of select="position()"/></xsl:attribute>
            <a>
                <xsl:attribute name="href">
-                    <xsl:value-of select="concat($intraLinkPrefix,'example-',position(),'.html')"/>
+                    <xsl:value-of select="concat($intraLinkPrefix,'example-',position(),'.html&quot;)')"/>
                 </xsl:attribute>
                <xsl:choose>
                    <xsl:when test="($itemInner='example' or $itemInner='theory') and position()=number($num)">
@@ -813,7 +825,7 @@ indent="yes" encoding="utf-8"/>
 <xsl:template match="digest" mode="navigation">
    <div class="menu-item-div" item="digest">
        <a>
-            <xsl:attribute name="href"><xsl:value-of select="concat($intraLinkPrefix,'digest.html')"/></xsl:attribute>
+            <xsl:attribute name="href"><xsl:value-of select="concat($intraLinkPrefix,'digest.html&quot;)')"/></xsl:attribute>
             <xsl:choose>
                 <xsl:when test="$itemInner='digest'">
                     <xsl:attribute name="id">selected-menu-item</xsl:attribute>
@@ -841,7 +853,7 @@ indent="yes" encoding="utf-8"/>
            <xsl:attribute name="context"><xsl:value-of select="@type"/></xsl:attribute>
        </xsl:if>
        <a>
-            <xsl:attribute name="href"><xsl:value-of select="concat($intraLinkPrefix,'application.html')"/></xsl:attribute>
+            <xsl:attribute name="href"><xsl:value-of select="concat($intraLinkPrefix,'application.html&quot;)')"/></xsl:attribute>
             <xsl:choose>
                 <xsl:when test="$itemInner='application'">
                     <xsl:attribute name="id">selected-menu-item</xsl:attribute>
@@ -861,7 +873,7 @@ indent="yes" encoding="utf-8"/>
         <xsl:when test="count(preceding-sibling::extra)+count(following-sibling::extra) > 0">
            <div class="menu-item-div" item="extra">
                <a>
-                    <xsl:attribute name="href"><xsl:value-of select="concat($intraLinkPrefix,'extra-',$explnum,'.html')"/></xsl:attribute>
+                    <xsl:attribute name="href"><xsl:value-of select="concat($intraLinkPrefix,'extra-',$explnum,'.html&quot;)')"/></xsl:attribute>
                     <xsl:choose>
                         <xsl:when test="$itemInner='extra' and $explnum=number($num)">
                             <xsl:attribute name="id">selected-menu-item</xsl:attribute>
@@ -876,7 +888,7 @@ indent="yes" encoding="utf-8"/>
         <xsl:otherwise>
            <div class="menu-item-div" item="extra">
                <a>
-                    <xsl:attribute name="href"><xsl:value-of select="concat($intraLinkPrefix,'extra.html')"/></xsl:attribute>
+                    <xsl:attribute name="href"><xsl:value-of select="concat($intraLinkPrefix,'extra.html&quot;)')"/></xsl:attribute>
                     <xsl:choose>
                         <xsl:when test="$itemInner='extra' and not(number($num) > 1)">
                             <xsl:attribute name="id">selected-menu-item</xsl:attribute>
@@ -894,7 +906,7 @@ indent="yes" encoding="utf-8"/>
 <xsl:template match="exam" mode="navigation">
    <div class="menu-item-div" item="digest">
        <a>
-            <xsl:attribute name="href"><xsl:value-of select="concat($intraLinkPrefix,'exam.html')"/></xsl:attribute>
+            <xsl:attribute name="href"><xsl:value-of select="concat($intraLinkPrefix,'exam.html&quot;)')"/></xsl:attribute>
             <xsl:choose>
                 <xsl:when test="$itemInner='exam'">
                     <xsl:attribute name="id">selected-menu-item</xsl:attribute>
@@ -910,7 +922,7 @@ indent="yes" encoding="utf-8"/>
 <xsl:template match="summary" mode="navigation">
    <div class="menu-item-div" item="summary">
        <a>
-            <xsl:attribute name="href"><xsl:value-of select="concat($intraLinkPrefix,'summary.html')"/></xsl:attribute>
+            <xsl:attribute name="href"><xsl:value-of select="concat($intraLinkPrefix,'summary.html&quot;)')"/></xsl:attribute>
             <xsl:choose>
                 <xsl:when test="$itemInner='summary'">
                     <xsl:attribute name="id">selected-menu-item</xsl:attribute>
@@ -925,7 +937,7 @@ indent="yes" encoding="utf-8"/>
 <xsl:template match="test" mode="navigation">
    <div class="menu-item-div" item="test">
        <a>
-            <xsl:attribute name="href"><xsl:value-of select="concat($intraLinkPrefix,'test.html')"/></xsl:attribute>
+            <xsl:attribute name="href"><xsl:value-of select="concat($intraLinkPrefix,'test.html&quot;)')"/></xsl:attribute>
             <xsl:choose>
                 <xsl:when test="$itemInner='test'">
                     <xsl:attribute name="id">selected-menu-item</xsl:attribute>
@@ -941,7 +953,7 @@ indent="yes" encoding="utf-8"/>
 <xsl:template match="background" mode="navigation">
    <div class="menu-item-div" item="background">
        <a>
-            <xsl:attribute name="href"><xsl:value-of select="concat($intraLinkPrefix,'background.html')"/></xsl:attribute>
+            <xsl:attribute name="href"><xsl:value-of select="concat($intraLinkPrefix,'background.html&quot;)')"/></xsl:attribute>
             <xsl:choose>
                 <xsl:when test="$itemInner='background'">
                     <xsl:attribute name="id">selected-menu-item</xsl:attribute>

@@ -75,6 +75,7 @@ export async function processFolder(folder: string, sector?: string) {
                     num: spec.multiple? i.toString(): '',
                     item: item,
                     parent: PARENT,
+                    docXML: component.folder + path.sep + componentName + '.xml',
                     component_title: component.title,
                     subcomponent_title: subcomponent.section,
                     subcomponent_index: (component.subcomponents.indexOf(subcomponentName)).toString(),
@@ -109,8 +110,25 @@ export async function processFolder(folder: string, sector?: string) {
     }
 
     if(firstItem) {
+        let basename = path.basename(firstItem);
         fs.writeFileSync(subcomponent.targetFolder + path.sep + 'index.html', 
-            '<html><head><meta http-equiv="refresh" content="0; url=' + path.basename(firstItem) + '"></head></html>');
+//            '<html><head><meta http-equiv="refresh" content="0; url=' + path.basename(firstItem) + '"></head></html>'
+`
+<html>
+   <head>
+     <script type="text/javascript">
+        const urlParams = new URLSearchParams(window.location.search);
+        let parent = urlParams.get('parent');
+        if(parent) {
+            window.location.href = '${basename}?parent=' + parent;
+        } else {
+            window.location.href = '${basename}';
+        }
+     </script>
+   </head>
+</html>
+`
+        );
     }
 }
 

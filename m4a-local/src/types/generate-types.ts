@@ -5,6 +5,7 @@ export interface XSLTParameters  {
     num: string;
     item: string;
     parent: string;
+    docXML: string;
     component_title: string;
     subcomponent_title: string;
     subcomponent_index: string;
