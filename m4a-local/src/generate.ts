@@ -2,7 +2,7 @@ import { XSLTParameters } from "./types/generate-types";
 import { createFolderIfNotExists } from "./util/files";
 import { Component, isComponentFile } from "./types/component";
 import { isSubcomponentFile, Subcomponent } from "./types/subcomponent";
-import { ITEMS, PARENT } from "./config";
+import { PARENT, VARIANTS } from "./config";
 import { USER_OPTIONS } from "./options";
 
 const fs = require('fs');
@@ -60,8 +60,9 @@ export async function processFolder(folder: string, sector?: string) {
     let xmlFile = fs.readFileSync(subcomponentFileName, 'utf8');
     let firstItem:string = null;
 
-    for(let item of Object.keys(ITEMS)) {
-        let spec = ITEMS[item];
+    let items = Object.keys(USER_OPTIONS.variant.items).sort((a, b) => USER_OPTIONS.variant.items[a].order - USER_OPTIONS.variant.items[b].order);
+    for(let item of items) {
+        let spec = USER_OPTIONS.variant.items[item];
         if(spec.always || xmlFile.includes('<' + item)) {
             let nr = 1;
             if(spec.multiple) {

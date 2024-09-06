@@ -28,7 +28,6 @@ extension-element-prefixes="exsl">
 <xsl:param name="docXML"/>                  <!-- path to the xml file of the component -->
 <xsl:variable name="lang">nl</xsl:variable>
 <xsl:variable name="urlbase">../</xsl:variable>
-<xsl:variable name="componentDoc" select="document($docXML)"/>
 <xsl:variable name="css_js_base">../../../</xsl:variable>
 <xsl:variable name="itemInner">
     <xsl:choose>
@@ -152,6 +151,12 @@ indent="yes" encoding="utf-8"/>
     <include>
         <xsl:attribute name="filename" select="@filename"/>
         <xsl:attribute name="num" select="1+count(preceding::examples/include)"/>
+    </include>
+</xsl:template>
+<xsl:template match="explanation/include" mode="numbering">
+    <include>
+        <xsl:attribute name="filename" select="@filename"/>
+        <xsl:attribute name="num" select="1+count(preceding::explanation/include)"/>
     </include>
 </xsl:template>
 

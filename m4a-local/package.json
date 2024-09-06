@@ -8,7 +8,7 @@
     "start": "node ./dist/main.js",
     "debug": "node --inspect-brk=8091 ./dist/main.js",
     "build": "./build.sh",
-    "build-xslt": "xslt3 -xsl:resources/xslt/m4a_view.xslt -export:m4a_view.sef.json -nogo;xslt3 -xsl:resources/xslt/m4a_view_en.xslt -export:m4a_view_en.sef.json -nogo; xslt3 -xsl:resources/xslt/m4a_view_mbo.xslt -export:m4a_view_mbo.sef.json -nogo; mv m4a_view* resources",
+    "build-xslt": "xslt3 -xsl:resources/xslt/m4a_view.xslt -export:m4a_view.sef.json -nogo;xslt3 -xsl:resources/xslt/m4a_view_saba.xslt -export:m4a_view_saba.sef.json -nogo;xslt3 -xsl:resources/xslt/m4a_view_en.xslt -export:m4a_view_en.sef.json -nogo; xslt3 -xsl:resources/xslt/m4a_view_mbo.xslt -export:m4a_view_mbo.sef.json -nogo; mv m4a_view* resources",
     "build-full": "./build.sh; npm run build-xslt"
   },
   "devDependencies": {
