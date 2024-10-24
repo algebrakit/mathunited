@@ -25,7 +25,6 @@ extension-element-prefixes="exsl">
 <xsl:param name="subcomponent_index"/>
 <xsl:param name="subcomponent_count"/>
 <xsl:param name="docbase"/>                 <!-- path prefix to resolve <include> -->
-<xsl:param name="docXML"/>                  <!-- path to the xml file of the component -->
 <xsl:variable name="lang">nl</xsl:variable>
 <xsl:variable name="urlbase">../</xsl:variable>
 <xsl:variable name="css_js_base">../../../</xsl:variable>
@@ -258,7 +257,7 @@ indent="yes" encoding="utf-8"/>
        <xsl:call-template name="list-section-nrs">
            <xsl:with-param name="i"><xsl:value-of select="number(1)"/></xsl:with-param>
            <xsl:with-param name="count"><xsl:value-of select="number($subcomponent_count)"/></xsl:with-param>
-           <xsl:with-param name="highlight"><xsl:value-of select="-1+number($subcomponent_index)"/></xsl:with-param>
+           <xsl:with-param name="highlight"><xsl:value-of select="number($subcomponent_index)"/></xsl:with-param>
            <xsl:with-param name="subcomponents" select="subcomponent/internal-meta/subcomponents"/>
        </xsl:call-template>
        <span class="subcomponent-title"><xsl:value-of select="$subcomponent_title"/></span>
@@ -384,10 +383,10 @@ indent="yes" encoding="utf-8"/>
             AlgebraKIT = {
                 config: {
                     proxy: {
-                        url: 'https://content.math4all.nl/algebrakit'
+                        url: 'https://testbench.algebrakit.com/algebrakit-secure'
                     },
                     secureProxy: {
-                        url: 'https://content.math4all.nl/algebrakit'
+                        url: 'https://testbench.algebrakit.com/algebrakit-secure'
                     }
                 }
             };
@@ -403,7 +402,7 @@ indent="yes" encoding="utf-8"/>
     <xsl:param name="highlight"/>
     <xsl:param name="subcomponents"/>
     <xsl:choose>
-        <xsl:when test="number($i) = number($highlight)+2">
+        <xsl:when test="number($i) = number($highlight)">
             <span class="list-section-nr highlight"><xsl:value-of select="$i"/></span>
         </xsl:when>
         <xsl:otherwise>

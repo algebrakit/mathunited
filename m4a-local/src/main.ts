@@ -13,7 +13,7 @@ async function main() {
         USER_OPTIONS = await getOptions();
 
         // copy css and js files to the target folder
-        copyFiles();
+        copyFiles(USER_OPTIONS.variant.sources);
         // search for modules in the folder
         if(USER_OPTIONS.sector) {
             for(let sector of USER_OPTIONS.sector) {
@@ -31,8 +31,8 @@ async function main() {
 /**
  * Copy the css and js files to the target folder
  */
-function copyFiles() {
-    ['css', 'js', 'sources', 'sources_ma'].forEach(folder => {
+function copyFiles(sources:string[]) {
+    sources.forEach(folder => {
         fs.cpSync(USER_OPTIONS.resourcesPath + path.sep + folder, USER_OPTIONS.targetFolder + path.sep + folder, { recursive: true });
     });
 }

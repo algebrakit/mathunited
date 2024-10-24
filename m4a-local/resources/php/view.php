@@ -26,22 +26,30 @@ $VARIANT_MAP = array(
         'root' => 'mbo',
         'sector' => true
     ),
+    'basis_wm' => array(
+        'redirect' => 'http://wm.math4allview.appspot.com/view?'
+    )
 );
 
 // Get the parameters from the URL
 $comp = $_GET['comp'];
 $subcomp = $_GET['subcomp'];
 
-if(!isset($_GET['variant'])) {
-    $variant = 'm4a_view';
-} else {
+$variant = 'm4a_view';
+if(isset($_GET['variant'])) {
     $variant = $_GET['variant'];
+} elseif(isset($_GET['repo'])) {
+    switch($_GET['repo']) {
+        case 'm4a_en': 
+            $variant = 'm4a_view_en';
+            break;
+    }
 }
 
 if(!isset($_GET['item'])) {
-    $item = 'explore';
+    $item = 'index';
 } else {
-    $item = $_GET['item'];
+    $item = "$subcomp-".$_GET['item'];
 }
 
 if (isset($_GET['num'])) {
@@ -67,26 +75,31 @@ if (!$variant_spec) {
     $variant_spec = $VARIANT_MAP['m4a_view'];
 }
 
-$root = $variant_spec['root'];
+$new_path = '';
+if($variant_spec['redirect']) {
+    $new_path = $variant_spec['redirect'].$_SERVER['QUERY_STRING'];
+} else {
+    $root = $variant_spec['root'];
 
-// Create the new path
-$new_path = "$root/content";
-if($variant_spec['sector']) {
+    // Create the new path
+    $new_path = "$root/content";
+    if($variant_spec['sector']) {
+        
+        $new_path .= "/$sector";
+    }
+    $new_path .= "/$comp/$subcomp/$item";
+    if($num) {
+        $new_path .= "-$num";
+    }
+    $new_path .= ".html";
     
-    $new_path .= "/$sector";
-}
-$new_path .= "/$comp/$subcomp/$subcomp-$item";
-if($num) {
-    $new_path .= "-$num";
-}
-$new_path .= ".html";
-
-if($parent!==null) {
-    $new_path .= "?parent=$parent";
+    if($parent!==null) {
+        $new_path .= "?parent=$parent";
+    }
+    
 }
 
 // Redirect to the new path
 header("Location: $new_path");
-// echo $new_path;
-exit;
+
 ?>

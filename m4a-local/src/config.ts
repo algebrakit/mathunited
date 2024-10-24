@@ -2,6 +2,7 @@ export interface VariantSetting {
     xsl: string;
     useSector: boolean;
     items: {[key:string]:any};
+    sources: string[]
 }
 
 export const SECTORS:string[] = ['bev', 'asc', 'eng', 'mob', 'ict', 'all'];
@@ -60,7 +61,8 @@ export const VARIANTS:{[key:string]:VariantSetting} = {
     hv: {
         xsl: 'm4a_view',
         useSector: false,
-        items: ITEMS
+        items: ITEMS,
+        sources: ['css', 'js', 'sources', 'sources_ma']
     },
     // hv_en: {
     //     xsl: 'm4a_view_en',
@@ -73,12 +75,23 @@ export const VARIANTS:{[key:string]:VariantSetting} = {
             'theory': ITEMS['theory'],
             'digest': ITEMS['digest'],
             'answers': ITEMS['answers']
-        }
+        },
+        sources: ['css', 'js', 'sources', 'sources_ma']
     },
     mbo: {
         xsl: 'm4a_view_mbo',
         useSector: true,
-        items: ITEMS
+        items: ITEMS,
+        sources: ['css', 'js', 'sources', 'sources_ma']
+    },
+    wm: {
+        xsl: 'wm_view',
+        useSector: false,
+        items: {
+            '': {order:1},
+            'answers': {always: true, order:2}
+        },
+        sources: ['css', 'js', 'sources', 'sources_wm']
     }
 }
 export const PARENT = 'https://math4all.nl';

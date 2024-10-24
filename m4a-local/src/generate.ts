@@ -1,7 +1,7 @@
 import { XSLTParameters } from "./types/generate-types";
 import { createFolderIfNotExists } from "./util/files";
 import { Component, isComponentFile } from "./types/component";
-import { isSubcomponentFile, Subcomponent } from "./types/subcomponent";
+import { Subcomponent } from "./types/subcomponent";
 import { PARENT, VARIANTS } from "./config";
 import { USER_OPTIONS } from "./options";
 
@@ -18,99 +18,109 @@ const GEOGEBRA_SOURCE = 'https://www.geogebra.org/apps/deployggb.js';
  * @returns 
  */
 export async function processFolder(folder: string, sector?: string) {
-    // get the folder name
-    let parts = folder.split(path.sep);
-    let folderName = parts[parts.length - 1];
-
-    // if the folder contains a subcomponent file, process it
-    let fileName = folder + '/' + folderName + '.xml';
-    if(fs.existsSync(fileName)) {
-        if(isSubcomponentFile(fileName)) {
-            await generateSubcomponent(folder, folderName, sector);
-            return;
-        } else if(isComponentFile(fileName)) {
-            let component = new Component(fileName, sector);
-            copyComponentResources(component);
-            generateGeogebra(component);
-        }
-    } 
-
-    // otherwise, process subfolders
     let files = fs.readdirSync(folder);
-    for(let file of files) {
-        let stat = fs.statSync(folder + path.sep + file);
-        if(stat.isDirectory()) {
-            await processFolder(folder + path.sep + file, sector);
+    let componentFiles = files.filter(file => file.endsWith('.xml') && !file.endsWith('entities.xml') && isComponentFile(folder + path.sep + file));
+    // let subcomponentFiles = files.filter(file => file.endsWith('.xml') && isSubcomponentFile(folder + path.sep + file));
+    if(componentFiles.length==0) {
+        // otherwise, process subfolders
+        for(let file of files) {
+            let stat = fs.statSync(folder + path.sep + file);
+            if(stat.isDirectory()) {
+                await processFolder(folder + path.sep + file, sector);
+            }
         }
+    } else if(componentFiles.length == 1) {
+        let fileName = folder + path.sep + componentFiles[0];
+        let component = new Component(fileName, sector);
+        copyComponentResources(component);
+        generateGeogebra(component);
+
+        await processComponent(component, sector);
+    } else {
+        throw new Error('Multiple component files found in ' + folder);
+    }
+     
+}
+
+async function processComponent(component: Component, sector?: string) {
+    let subcomponents = component.subcomponents;
+    for(let subcomponent of subcomponents) {
+        await generateSubcomponent(subcomponent, sector);
     }
 }
 
- async function generateSubcomponent(subcomponentFolder:string, subcomponentName:string, sector: string) {
-    console.log('Subcomponent ' + subcomponentName);
-
-    // get the component name. E.g. hv-gr1 if the subcomponent folder is hv-gr11
-    let componentFolder = path.dirname(subcomponentFolder);
-    let componentName = path.basename(componentFolder);
-    let component = new Component(componentFolder + path.sep + componentName + '.xml', sector);
-    let subcomponent = new Subcomponent(subcomponentName, component);
+ async function generateSubcomponent(subcomponent: Subcomponent, sector: string) {
+    console.log('Subcomponent ' + subcomponent.id);
     
     createFolderIfNotExists(subcomponent.targetFolder);
 
-    let subcomponentFileName = subcomponentFolder + path.sep + subcomponentName + '.xml';
-    let xmlFile = fs.readFileSync(subcomponentFileName, 'utf8');
+    let xmlFile = fs.readFileSync(subcomponent.file, 'utf8');
     let firstItem:string = null;
 
-    let items = Object.keys(USER_OPTIONS.variant.items).sort((a, b) => USER_OPTIONS.variant.items[a].order - USER_OPTIONS.variant.items[b].order);
+    // generate items in the right order. We want to know which item is first, to use as default for the index.html file.
+    let items = null;
+    items = Object.keys(USER_OPTIONS.variant.items).sort((a, b) => USER_OPTIONS.variant.items[a].order - USER_OPTIONS.variant.items[b].order);
     for(let item of items) {
         let spec = USER_OPTIONS.variant.items[item];
+        // check if the item exists in the html. Some items (like answers) are always generated.
         if(spec.always || xmlFile.includes('<' + item)) {
             let nr = 1;
             if(spec.multiple) {
+                // some items occur multiple times, such as exercise items. A 'num' attribute identifies the item.
                 let matches = xmlFile.match(new RegExp('<' + item, 'g'));
                 nr = matches.length
             }
+
             for(let i = 1; i <= nr; i++) {
                 let params: XSLTParameters = {
-                    comp: componentName,
-                    subcomp: subcomponentName,
+                    comp: subcomponent.component.name,
+                    subcomp: subcomponent.id,
                     num: spec.multiple? i.toString(): '',
                     item: item,
                     parent: PARENT,
-                    docXML: component.folder + path.sep + componentName + '.xml',
-                    component_title: component.title,
-                    subcomponent_title: subcomponent.section,
-                    subcomponent_index: (component.subcomponents.indexOf(subcomponentName)).toString(),
-                    subcomponent_count: component.subcomponents.length.toString(),
+                    component_title: subcomponent.component.title,
+                    component_number: subcomponent.component.number.toString(),
+                    subcomponent_title: subcomponent.title,
+                    subcomponent_number: subcomponent.number.toString(),
+                    subcomponent_index: ''+subcomponent.number,
+                    subcomponent_count: subcomponent.component.subcomponents.length.toString(),
+                    subcomponent_preceding_id: subcomponent.prevId,
+                    subcomponent_following_id: subcomponent.followingId,
                     sector: sector
                 }
 
                 // generate html for the item
-                let result = await transform(subcomponentFolder, params);
-                let fname = subcomponent.targetFolder + path.sep +subcomponentName + '-' + item 
-                    + ((spec.multiple)?('-'+ i + '.html'):( '.html'));
+                let result = await transform(subcomponent, params);
+                let fname = subcomponent.targetFolder + path.sep +subcomponent.id;
+                if(item) fname+= '-' + item;  // WM has an empty item, so leave out the '-'
+                fname+= ((spec.multiple)?('-'+ i + '.html'):( '.html'));
                 if(!firstItem) firstItem = fname;
                 fs.writeFileSync(fname, result);
 
-                // check for worksheets
-                let regExp = new RegExp(subcomponentName+'-worksheet-[^"]+', 'g');
+                // check for references to worksheets in the generated html
+                let regExp = new RegExp(subcomponent.id+'-worksheet-[^"]+', 'g');
                 let matches = result.match(regExp);
                 if(matches) {
+                    // let the XSLT generate the worksheet html
                     matches.forEach(async match => {
-                        let worksheet = match.substring(subcomponentName.length+11);
+                        let worksheet = match.substring(subcomponent.id.length+11).replace('.html','');
                         let worksheetParams: XSLTParameters = {
                             ...params,
                             ws_id: worksheet
                         }
-                        let worksheetResult = await transform(subcomponentFolder, worksheetParams);
-                        fs.writeFileSync(subcomponent.targetFolder + path.sep + subcomponentName + '-worksheet-' + worksheet + '.html', worksheetResult);
+                        let worksheetResult = await transform(subcomponent, worksheetParams);
+                        fs.writeFileSync(subcomponent.targetFolder + path.sep + subcomponent.id + '-worksheet-' + worksheet + '.html', worksheetResult);
                     })
                 }
 
             }
-        }
+
+        }    
     }
+        
 
     if(firstItem) {
+        // generate an index.html file that redirects to the first item
         let basename = path.basename(firstItem);
         fs.writeFileSync(subcomponent.targetFolder + path.sep + 'index.html', 
 //            '<html><head><meta http-equiv="refresh" content="0; url=' + path.basename(firstItem) + '"></head></html>'
@@ -189,13 +199,13 @@ function copyComponentResources(component:Component) {
  * 
  * @param fname the xml filename in the module folder
  */
-async function transform(moduleFolder:string, params: XSLTParameters) {
+async function transform(subcomponent:Subcomponent, params: XSLTParameters) {
     const options = { 
         stylesheetInternal: USER_OPTIONS.xsltJSON,
         destination: "serialized",
-        sourceFileName: moduleFolder+'/'+params.subcomp+'.xml',
+        sourceFileName: subcomponent.file,
         stylesheetParams: {
-            docbase: moduleFolder + '/',
+            docbase: subcomponent.folder + '/',
             ...params
         }
     };
