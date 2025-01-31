@@ -54,7 +54,7 @@ async function processComponent(component: Component, sector?: string) {
     
     createFolderIfNotExists(subcomponent.targetFolder);
 
-    let xmlFile = fs.readFileSync(subcomponent.file, 'utf8');
+    let xmlFile = fs.readFileSync(subcomponent.file, 'utf8').trim();
     let firstItem:string = null;
 
     // generate items in the right order. We want to know which item is first, to use as default for the index.html file.

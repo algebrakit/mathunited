@@ -6,3 +6,4 @@ Publisher/html/moxiemanager/data/storage/user.anonymous.json
 **/.idea/
 **/.DS_Store
 GAE_M4A/*.iml
+node_modules/

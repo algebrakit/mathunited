@@ -62,7 +62,7 @@ export class Component {
 
 export function isComponentFile(fname: string): boolean {
     try{
-        let content = fs.readFileSync(fname, 'utf8');
+        let content = fs.readFileSync(fname, 'utf8').trim();
         let xml = new dom().parseFromString(content, 'text/xml');
         let componentTag = xpath.select('/component', xml);
         return componentTag.length > 0;    

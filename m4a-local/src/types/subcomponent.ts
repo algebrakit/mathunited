@@ -41,7 +41,7 @@ export class Subcomponent {
 
 export function isSubcomponentFile(fname: string): boolean {
     try{
-        let content = fs.readFileSync(fname, 'utf8');
+        let content = fs.readFileSync(fname, 'utf8').trim();
         let xml = new dom().parseFromString(content, 'text/xml');
         let subcomponentTag = xpath.select('/subcomponent', xml);
         return (subcomponentTag as any).length > 0;
