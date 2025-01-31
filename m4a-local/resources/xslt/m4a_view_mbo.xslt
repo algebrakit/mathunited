@@ -425,10 +425,10 @@ indent="yes" encoding="utf-8"/>
             AlgebraKIT = {
                 config: {
                     proxy: {
-                        url: 'https://content.math4all.nl/algebrakit'
+                        url: 'https://testbench.algebrakit.com/algebrakit-secure'
                     },
                     secureProxy: {
-                        url: 'https://content.math4all.nl/algebrakit'
+                        url: 'https://testbench.algebrakit.com/algebrakit-secure'
                     }
                 }
             };
